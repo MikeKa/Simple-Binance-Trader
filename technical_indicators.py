@@ -69,14 +69,14 @@ find_high_low   = lambda x, y, z: x.min() if z < x.min() < y else None
 def get_BOLL(prices, time_values=None, ma_type=21, stDev=2, map_time=False):
     """
     This function uses 2 parameters to calculate the BB-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         ma_type : BB ma type.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [{
         'M':float,
@@ -92,8 +92,8 @@ def get_BOLL(prices, time_values=None, ma_type=21, stDev=2, map_time=False):
     BBot = np.array([sma[i] - (stdev[i] * stDev) for i in range(span)])
 
     boll = [{
-        "T":BTop[i], 
-        "M":sma[i], 
+        "T":BTop[i],
+        "M":sma[i],
         "B":BBot[i]} for i in range(span)]
 
     if map_time:
@@ -104,16 +104,16 @@ def get_BOLL(prices, time_values=None, ma_type=21, stDev=2, map_time=False):
 
 ## This function is used to calculate and return the RSI indicator.
 def get_RSI(prices, time_values=None, rsiType=14, map_time=False):
-    """ 
+    """
     This function uses 2 parameters to calculate the RSI-
-    
+
     [PARAMETERS]
         prices  : The prices to be used.
         rsiType : The interval type.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [
         float,
@@ -167,15 +167,15 @@ def get_stochastics(priceClose, priceHigh, priceLow, period=14):
 def get_stochRSI(prices, time_values=None, rsiPrim=14, rsiSecon=14, K=3, D=3, map_time=False):
     """
     This function uses 3 parameters to calculate the  Stochastics RSI-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         rsiType : The interval type.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [{
         "%K":float,
@@ -186,7 +186,7 @@ def get_stochRSI(prices, time_values=None, rsiPrim=14, rsiSecon=14, K=3, D=3, ma
     RSI = get_RSI(prices, rsiType=rsiPrim)
 
     stoch_rsi = get_S_O(RSI, RSI, RSI, time_values=time_values, period=rsiSecon, K=K, D=D, map_time=map_time)
-    
+
     return stoch_rsi
 
 
@@ -194,17 +194,17 @@ def get_stochRSI(prices, time_values=None, rsiPrim=14, rsiSecon=14, K=3, D=3, ma
 def get_S_O(priceClose, priceHigh, priceLow, time_values=None, period=14, K=3, D=3, map_time=False):
     """
     This function uses 5 parameters to calculate the  Stochastic Oscillator-
-    
+
     [PARAMETERS]
         candles : A list of prices.
         K_period : The interval for the inital K calculation.
         K_smooth: The smooting interval or the K period.
         D_smooth: The smooting interval or the K period.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [{
         "%K":float,
@@ -224,7 +224,7 @@ def get_S_O(priceClose, priceHigh, priceLow, time_values=None, period=14, K=3, D
     sto_D = get_SMA(sto_K, D)
 
     stoc_osc = [{
-        "%K":sto_K[i], 
+        "%K":sto_K[i],
         "%D":sto_D[i]} for i in range(len(sto_D))]
 
     if map_time:
@@ -237,15 +237,15 @@ def get_S_O(priceClose, priceHigh, priceLow, time_values=None, period=14, K=3, D
 def get_SMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_format='normal'):
     """
     This function uses 3 parameters to calculate the Simple Moving Average-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         ma_type : The interval type.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         SMA = average of prices within a given period
-    
+
     [RETURN]
         [
         float,
@@ -270,16 +270,16 @@ def get_SMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_f
 def get_EMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_format='normal'):
     """
     This function uses 3 parameters to calculate the Exponential Moving Average-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         ma_type : The interval type.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         weight = 2 / (maPerido + 1)
         EMA = ((close - prevEMA) * weight + prevEMA)
-    
+
     [RETURN]
         [
         float,
@@ -287,6 +287,8 @@ def get_EMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_f
         ... ]
     """
     span = len(prices) - maPeriod
+    print(span)
+    print(prices[span-1])
     EMA = np.zeros_like(prices[:span])
     weight = (2 / (maPeriod +1))
     SMA = get_SMA(prices[span:], maPeriod, result_format='numpy')
@@ -311,15 +313,15 @@ def get_EMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_f
 def get_RMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_format='normal'):
     """
     This function uses 3 parameters to calculate the Rolling Moving Average-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         SS_type : The interval type.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         RMA = ((prevRMA * (period - 1)) + currPrice) / period
-    
+
     [RETURN]
         [
         float,
@@ -350,18 +352,18 @@ def get_RMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_f
 def get_MACD(prices, time_values=None, Efast=12, Eslow=26, signal=9, map_time=False):
     """
     This function uses 5 parameters to calculate the Moving Average Convergence/Divergence-
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         Efast   : Fast line type.
         Eslow   : Slow line type.
         signal  : Signal line type.
-    
+
     [CALCULATION]
         MACDLine = fastEMA - slowEMA
         SignalLine = EMA of MACDLine
         Histogram = MACDLine - SignalLine
-    
+
     [RETURN]
         [{
         'fast':float,
@@ -377,8 +379,8 @@ def get_MACD(prices, time_values=None, Efast=12, Eslow=26, signal=9, map_time=Fa
     histogram = np.subtract(macdLine[:len(signalLine)], signalLine)
 
     macd = [({
-        "macd":float("{0}".format(macdLine[i])), 
-        "signal":float("{0}".format(signalLine[i])), 
+        "macd":float("{0}".format(macdLine[i])),
+        "signal":float("{0}".format(signalLine[i])),
         "hist":float("{0}".format(histogram[i]))}) for i in range(len(signalLine))]
 
     if map_time:
@@ -401,13 +403,13 @@ def get_zeroLagMACD(prices, time_values=None, Efast=12, Eslow=26, signal=9, map_
     This function uses 5 parameters to calculate the Moving Average Convergence/Divergence-
 
     Solution with thanks to @dsiens
-    
+
     [PARAMETERS]
         prices  : A list of prices.
         Efast   : Fast line type.
         Eslow   : Slow line type.
         signal  : Signal line type.
-    
+
     [CALCULATION]
         MACDLine = (2 * EMA(price, FAST) - EMA(EMA(price, FAST), FAST)) - (2 * EMA(price, SLOW) - EMA(EMA(price, SLOW), SLOW))
         SignalLine = 2 * EMA(MACD, SIG) - EMA(EMA(MACD, SIG), SIG))
@@ -427,8 +429,8 @@ def get_zeroLagMACD(prices, time_values=None, Efast=12, Eslow=26, signal=9, map_
     histogram = np.subtract(lineMACD[:len(lineSIGNAL)], lineSIGNAL)
 
     z_lag_macd = [({
-        "macd":float("{0}".format(lineMACD[i])), 
-        "signal":float("{0}".format(lineSIGNAL[i])), 
+        "macd":float("{0}".format(lineMACD[i])),
+        "signal":float("{0}".format(lineSIGNAL[i])),
         "hist":float("{0}".format(histogram[i]))}) for i in range(len(lineSIGNAL))]
 
     if map_time:
@@ -445,10 +447,10 @@ def get_trueRange(candles):
     [PARAMETERS]
         candles : Dict of candles.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [
         float,
@@ -477,15 +479,15 @@ def get_trueRange(candles):
 def get_ATR(candles, atrPeriod=14):
     """
     This function uses 3 parameters to calculate the Average True Range-
-    
+
     [PARAMETERS]
         candles : Dict of candles.
         atr_type: The ATR type.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [
         float,
@@ -502,14 +504,14 @@ def get_ATR(candles, atrPeriod=14):
 def get_DM(candles):
     """
     This function uses 2 parameters to calculate the positive and negative Directional Movement-
-    
+
     [PARAMETERS]
         candles : Dict of candles.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [[
         float,
@@ -544,10 +546,10 @@ def get_ADX_DI(rCandles, adxLen=14, dataType="numpy", map_time=False):
         adx_type: The ADX type.
         adx_smooth: The smooting interval or the adx.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         ---
-    
+
     [RETURN]
         [{
         'ADX':float,
@@ -557,7 +559,7 @@ def get_ADX_DI(rCandles, adxLen=14, dataType="numpy", map_time=False):
     """
 
     if dataType == "normal":
-        candles = np.array([[0, 
+        candles = np.array([[0,
             rCandles["open"][i],
             rCandles["high"][i],
             rCandles["low"][i],
@@ -582,8 +584,8 @@ def get_ADX_DI(rCandles, adxLen=14, dataType="numpy", map_time=False):
     ADX = get_SMA(DI, adxLen)
 
     ADX_DI = [({
-        "ADX":float("{0:3f}".format(ADX[i])), 
-        "+DI":float("{0:.3f}".format(PDI[i])), 
+        "ADX":float("{0:3f}".format(ADX[i])),
+        "+DI":float("{0:.3f}".format(PDI[i])),
         "-DI":float("{0:.3f}".format(NDI[i]))}) for i in range(len(ADX))]
 
     if map_time:
@@ -600,14 +602,14 @@ def get_Ichimoku(candles, tS_type=9, kS_type=26, sSB_type=52, dataType="numpy", 
     [PARAMETERS]
         candles : Dict of candles.
         ind_span: The span of the indicator.
-    
+
     [CALCULATION]
         Tenkan-sen      = (9-day high + 9-day low) / 2
         Kijun-sen       = (26-day high + 26-day low) / 2
         Senkou Span A   = (Tenkan-sen + Kijun-sen) / 2 (This is usually plotted 26 intervals ahead)
         Senkou Span B   = (52-day high + 52-day low) / 2 (This is usually plotted 26 intervals ahead)
         Chikou Span     = current close (This is usually plotted 26 intervals behind)
-    
+
     [RETURN]
         [{
         'Temka':float,
@@ -663,7 +665,7 @@ def get_CCI(rCandles, source='all', period=14, constant=0.015, dataType="numpy",
 
     """
     if dataType == "normal":
-        candles = np.array([[0, 
+        candles = np.array([[0,
                 rCandles["open"][i],
                 rCandles["high"][i],
                 rCandles["low"][i],
@@ -687,10 +689,10 @@ def get_CCI(rCandles, source='all', period=14, constant=0.015, dataType="numpy",
 
 def get_Mean_ABS_Deviation(prices, period):
     """
-    There are four steps to calculating the Mean Deviation: 
-    First, subtract the most recent 20-period average of the typical price from each period's typical price. 
-    Second, take the absolute values of these numbers. 
-    Third, sum the absolute values. 
+    There are four steps to calculating the Mean Deviation:
+    First, subtract the most recent 20-period average of the typical price from each period's typical price.
+    Second, take the absolute values of these numbers.
+    Third, sum the absolute values.
     Fourth, divide by the total number of periods (20).
     """
     partOneTwo = []
@@ -782,7 +784,7 @@ def get_MFI(rCandles, period=14, dataType="numpy", map_time=False):
     '''
 
     if dataType == "normal":
-        candles = np.array([[0, 
+        candles = np.array([[0,
             rCandles["open"][i],
             rCandles["high"][i],
             rCandles["low"][i],
@@ -817,7 +819,7 @@ def get_heiken_ashi_candles(rCandles, dataType="numpy"):
     '''
 
     if dataType == "normal":
-        candles = np.array([[0, 
+        candles = np.array([[0,
             rCandles["open"][i],
             rCandles["high"][i],
             rCandles["low"][i],
@@ -905,5 +907,5 @@ def get_tops_bottoms(candles, segment_span, price_point, is_reverse=True, map_ti
         data_points.insert(0, [ int(candles[new_val_index][0]), point_val ])
 
     data_points = data_points if map_time else [point[1] for point in data_points]
-    
+
     return(data_points)
