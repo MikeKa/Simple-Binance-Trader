@@ -11,8 +11,8 @@ from decimal import Decimal
 from flask_socketio import SocketIO
 from flask import Flask, render_template, url_for, request
 
-from binance_api import rest_master
-from binance_api import socket_master
+from . binance_api import rest_master
+from . binance_api import socket_master
 
 from . import trader
 
@@ -58,7 +58,7 @@ def dated_url_for(endpoint, **values):
 @APP.route('/', methods=['GET'])
 def control_panel():
     # Base control panel configuration.
-    global started_updater 
+    global started_updater
 
     ## Web updater used for live updating.
     if not(started_updater):
@@ -301,7 +301,7 @@ class BotCore():
             traderObject.setup_initial_values(self.market_type, self.run_type, market_rules)
             self.trader_objects.append(traderObject)
 
-        
+
         ## Show markets that dont exist on the binance exchange.
         if len(self.trading_markets) != len(found_markets):
             no_market_text = ''
@@ -342,7 +342,7 @@ class BotCore():
             elif self.market_type == 'MARGIN':
                 wallet_balances = user_info['userAssets']
             current_tokens = {}
-            
+
             for balance in wallet_balances:
                 total_balance = (float(balance['free']) + float(balance['locked']))
                 if total_balance > 0:
@@ -508,8 +508,8 @@ def start(settings, logs_dir, cache_dir):
     host_ip = settings['host_ip']
     host_port = settings['host_port']
 
-    SOCKET_IO.run(APP, 
-        host=settings['host_ip'], 
-        port=settings['host_port'], 
-        debug=True, 
+    SOCKET_IO.run(APP,
+        host=settings['host_ip'],
+        port=settings['host_port'],
+        debug=True,
         use_reloader=False)
