@@ -287,8 +287,6 @@ def get_EMA(prices, maPeriod, time_values=None, prec=8, map_time=False, result_f
         ... ]
     """
     span = len(prices) - maPeriod
-    print(span)
-    print(prices[span-1])
     EMA = np.zeros_like(prices[:span])
     weight = (2 / (maPeriod +1))
     SMA = get_SMA(prices[span:], maPeriod, result_format='numpy')
