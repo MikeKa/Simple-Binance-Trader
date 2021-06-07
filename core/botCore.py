@@ -60,10 +60,10 @@ def dated_url_for(endpoint, **values):
 
 
 @APP.route('/', methods=['GET'])
-global core_object, host_ip, host_port
-if core_object == None:
-    core_object = BotCore(settings, logs_dir, cache_dir)
-    core_object.start()
+
+    if core_object == None:
+        core_object = BotCore(settings, logs_dir, cache_dir)
+
 
 def control_panel():
     # Base control panel configuration.
