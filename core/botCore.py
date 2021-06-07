@@ -60,12 +60,9 @@ def dated_url_for(endpoint, **values):
 
 
 @APP.route('/', methods=['GET'])
-
-
-core_object = BotCore(settings, logs_dir, cache_dir)
-
-
 def control_panel():
+
+    core_object = BotCore(settings, logs_dir, cache_dir)
     # Base control panel configuration.
     global started_updater
 
