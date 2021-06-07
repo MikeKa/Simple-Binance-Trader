@@ -1,2 +1,2 @@
-web: gunicorn core.botCore:APP
+web: gunicorn -k SocketIO.worker run:APP
 worker: python3 run.py
