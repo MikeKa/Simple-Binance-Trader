@@ -1,2 +1,2 @@
-web: gunicorn botCore:APP
+web: gunicorn --pythonpath core botCore:APP
 worker: python3 run.py
