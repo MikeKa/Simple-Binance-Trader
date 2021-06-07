@@ -29,14 +29,8 @@ CORS(APP)
 cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 
 ## Initilize base core object.
-global core_object, host_ip, host_port
 
 core_object = None
-
-
-if core_object == None:
-    core_object = BotCore(settings, logs_dir, cache_dir)
-    core_object.start()
 
 started_updater = False
 
@@ -66,6 +60,11 @@ def dated_url_for(endpoint, **values):
 
 
 @APP.route('/', methods=['GET'])
+global core_object, host_ip, host_port
+if core_object == None:
+    core_object = BotCore(settings, logs_dir, cache_dir)
+    core_object.start()
+
 def control_panel():
     # Base control panel configuration.
     global started_updater
