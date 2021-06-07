@@ -61,8 +61,8 @@ def dated_url_for(endpoint, **values):
 
 @APP.route('/', methods=['GET'])
 
-    if core_object == None:
-        core_object = BotCore(settings, logs_dir, cache_dir)
+if core_object == None:
+    core_object = BotCore(settings, logs_dir, cache_dir)
 
 
 def control_panel():
