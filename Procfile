@@ -1,2 +1,2 @@
 worker: python3 run.py
-web: gunicorn -k gevent -w 1 core.botCore:APP
+web: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 core.botCore:APP
