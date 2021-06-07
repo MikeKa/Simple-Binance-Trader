@@ -4,3 +4,4 @@ flask
 flask-socketio==4.3.2
 flask-cors
 websocket-client
+gunicorn
