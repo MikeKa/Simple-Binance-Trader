@@ -15,7 +15,7 @@ from flask_cors import CORS
 from binance_api import rest_master
 from binance_api import socket_master
 
-from . import trader
+import trader
 
 
 MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
