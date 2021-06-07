@@ -12,8 +12,8 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template, url_for, request
 from flask_cors import CORS
 
-from . binance_api import rest_master
-from . binance_api import socket_master
+from binance_api import rest_master
+from binance_api import socket_master
 
 from . import trader
 
