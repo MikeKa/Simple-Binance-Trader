@@ -10,6 +10,7 @@ import threading
 from decimal import Decimal
 from flask_socketio import SocketIO
 from flask import Flask, render_template, url_for, request
+from flask_cors import CORS
 
 from . binance_api import rest_master
 from . binance_api import socket_master
@@ -24,6 +25,8 @@ MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 ## Setup flask app/socket
 APP         = Flask(__name__)
 SOCKET_IO   = SocketIO(APP)
+CORS(APP)
+cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 
 ## Initilize base core object.
 core_object = None
@@ -509,6 +512,7 @@ def start(settings, logs_dir, cache_dir):
     host_port = settings['host_port']
 
     SOCKET_IO.run(APP,
+        #cors_allowed_origins='*',
         host=settings['host_ip'],
         port=settings['host_port'],
         debug=True,
