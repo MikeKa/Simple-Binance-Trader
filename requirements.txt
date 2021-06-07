@@ -6,3 +6,4 @@ flask-cors
 websocket-client
 gunicorn
 gevent
+gevent-websocket
