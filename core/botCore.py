@@ -30,7 +30,7 @@ cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 
 ## Setup base core object properties    
 cwd = os.getcwd()
-logs_dir_DIR = 'cache/'.format(cwd)
+logs_dir = 'cache/'.format(cwd)
 cache_dir = 'logs/'.format(cwd)
 settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500,'max_depth':50}
 
