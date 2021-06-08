@@ -44,8 +44,8 @@ class BotFront():
         self.socket_api         = socket_master.Binance_SOCK()
 
         ## Setup the logs/cache dir locations.
-       self.logs_dir           = logs_dir
-       self.cache_dir          = cache_dir
+        self.logs_dir           = logs_dir
+        self.cache_dir          = cache_dir
 
         ## Setup run type, market type, and update bnb balance.
 #        self.run_type           = settings['run_type']
