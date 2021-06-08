@@ -511,5 +511,10 @@ def start(settings, logs_dir, cache_dir):
 
     host_ip = settings['host_ip']
     host_port = settings['host_port']
-
+    
+    SOCKET_IO.run(APP, 
+        host=settings['host_ip'], 
+        port=settings['host_port'], 
+        debug=True, 
+        use_reloader=False)
 
