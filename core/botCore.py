@@ -21,6 +21,63 @@ from core import trader
 MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 
 # Initilize globals.
+
+## Setup flask app/socket
+APP         = Flask(__name__)
+SOCKET_IO   = SocketIO(APP)
+CORS(APP)
+cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
+
+## Setup base core object properties    
+cwd = os.getcwd()
+logs_dir = 'cache/'.format(cwd)
+cache_dir = 'logs/'.format(cwd)
+settings_web = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500, 'max_depth':50, 'market_type':'MARGIN', 'trading_currency':0.002, 'trader_interval':'5m', 'trading_markets':['BTC-ETH']}
+
+class BotFront():
+    def __init__(self, settings_web, logs_dir, cache_dir):
+        # Initilization for the bot core managment object.
+        logging.info('[BotCore] Initilizing the BotCore object.')
+
+        ## Setup binance REST and socket API.
+#        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
+#        self.socket_api         = socket_master.Binance_SOCK()
+
+        ## Setup the logs/cache dir locations.
+        self.logs_dir           = logs_dir
+        self.cache_dir          = cache_dir
+
+        ## Setup run type, market type, and update bnb balance.
+#        self.run_type           = settings['run_type']
+        self.market_type        = settings_web['market_type']
+#        self.update_bnb_balance = settings['update_bnb_balance']
+
+        ## Setup max candle/depth setting.
+        self.max_candles        = settings_web['max_candles']
+        self.max_depth          = settings_web['max_depth']
+
+        ## Get base quote pair (This prevents multiple different pairs from conflicting.)
+        pair_one = settings_web['trading_markets'][0]
+        print(pair_one)
+
+        self.quote_asset        = pair_one[:pair_one.index('-')]
+        self.base_currency      = settings_web['trading_currency']
+        self.candle_Interval    = settings_web['trader_interval']
+
+        ## Initilize base trader settings.
+        self.trader_objects     = []
+        self.trading_markets    = settings_web['trading_markets']
+
+        ## Initilize core state
+        self.coreState          = 'READY'
+
+## Initilize base core object.
+core_object_web = BotFront(settings_web, logs_dir, cache_dir)
+print(settings_web)
+
+#core_object = None
+started_updater = False
+
 ## Initilize IP/port pair globals.
 host_ip     = ''
 host_port   = ''
@@ -29,191 +86,132 @@ host_port   = ''
 CAHCE_FILES = 'traders.json'
 
 
-## Setup flask app/socket
-
-APP         = Flask(__name__)
-if __name__ == '__main__':
-    SOCKET_IO   = SocketIO(APP)
-    CORS(APP)
-    cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
-
-    ## Setup base core object properties    
-    cwd = os.getcwd()
-    logs_dir = 'cache/'.format(cwd)
-    cache_dir = 'logs/'.format(cwd)
-    settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500, 'max_depth':50, 'market_type':'MARGIN', 'trading_currency':0.002, 'trader_interval':'5m', 'trading_markets':['BTC-ETH']}
-
-    class BotFront():
-        def __init__(self, settings, logs_dir, cache_dir):
-            # Initilization for the bot core managment object.
-            logging.info('[BotCore] Initilizing the BotCore object.')
-
-            ## Setup binance REST and socket API.
-    #        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
-    #        self.socket_api         = socket_master.Binance_SOCK()
-
-            ## Setup the logs/cache dir locations.
-            self.logs_dir           = logs_dir
-            self.cache_dir          = cache_dir
-
-            ## Setup run type, market type, and update bnb balance.
-    #        self.run_type           = settings['run_type']
-            self.market_type        = settings['market_type']
-    #        self.update_bnb_balance = settings['update_bnb_balance']
-
-            ## Setup max candle/depth setting.
-            self.max_candles        = settings['max_candles']
-            self.max_depth          = settings['max_depth']
-
-            ## Get base quote pair (This prevents multiple different pairs from conflicting.)
-            pair_one = settings['trading_markets'][0]
-            print(pair_one)
-
-            self.quote_asset        = pair_one[:pair_one.index('-')]
-            self.base_currency      = settings['trading_currency']
-            self.candle_Interval    = settings['trader_interval']
-
-            ## Initilize base trader settings.
-            self.trader_objects     = []
-            self.trading_markets    = settings['trading_markets']
-
-            ## Initilize core state
-            self.coreState          = 'READY'
-
-    ## Initilize base core object.
-    core_object = BotFront(settings, logs_dir, cache_dir)
-    print(settings)
-
-    started_updater = False
+@APP.context_processor
+def override_url_for():
+    return(dict(url_for=dated_url_for))
 
 
-
-    @APP.context_processor
-    def override_url_for():
-        return(dict(url_for=dated_url_for))
-
-
-    def dated_url_for(endpoint, **values):
-        # Override to prevent cached assets being used.
-        if endpoint == 'static':
-            filename = values.get('filename', None)
-            if filename:
-                file_path = os.path.join(APP.root_path,
-                                        endpoint,
-                                        filename)
-                values['q'] = int(os.stat(file_path).st_mtime)
-        return url_for(endpoint, **values)
+def dated_url_for(endpoint, **values):
+    # Override to prevent cached assets being used.
+    if endpoint == 'static':
+        filename = values.get('filename', None)
+        if filename:
+            file_path = os.path.join(APP.root_path,
+                                    endpoint,
+                                    filename)
+            values['q'] = int(os.stat(file_path).st_mtime)
+    return url_for(endpoint, **values)
 
 
-    @APP.route('/', methods=['GET'])
-    def control_panel():
-        # Base control panel configuration.
-        global started_updater
+@APP.route('/', methods=['GET'])
+def control_panel():
+    # Base control panel configuration.
+    global started_updater
 
-        ## Web updater used for live updating.
-        if not(started_updater):
-            started_updater = True
-            web_updater_thread = threading.Thread(target=web_updater)
-            web_updater_thread.start()
+    ## Web updater used for live updating.
+    if not(started_updater):
+        started_updater = True
+        web_updater_thread = threading.Thread(target=web_updater)
+        web_updater_thread.start()
 
-        ## Set socket ip/port.
-        start_up_data = {
-            'host':{'IP': host_ip, 'Port': host_port},
-            'market_symbols': core_object.trading_markets
-        }
+    ## Set socket ip/port.
+    start_up_data = {
+        'host':{'IP': host_ip, 'Port': host_port},
+        'market_symbols': core_object_web.trading_markets
+    }
 
-        return(render_template('main_page.html', data=start_up_data))
-
-
-    @APP.route('/rest-api/v1/trader_update', methods=['POST'])
-    def update_trader():
-        # Base API for managing trader interaction.
-        data = request.get_json()
-
-        ## Check if specified bot exists.
-        current_trader = api_error_check(data)
-
-        if current_trader == None:
-            ## No trader therefore return false.
-            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
-        elif data['action'] == 'start':
-            ## Updating trader status to running.
-            if current_trader.state_data['runtime_state'] == 'FORCE_PAUSE':
-                current_trader.state_data['runtime_state'] = 'RUN'
-        elif data['action'] == 'pause':
-            ## Updating trader status to paused.
-            if current_trader.state_data['runtime_state'] == 'RUN':
-                current_trader.state_data['runtime_state'] = 'FORCE_PAUSE'
-        else:
-            ## If action was not found return false
-            return(json.dumps({'call':False, 'message':'INVALID_ACTION'}))
-
-        return(json.dumps({'call':True}))
+    return(render_template('main_page.html', data=start_up_data))
 
 
-    @APP.route('/rest-api/v1/get_trader_charting', methods=['GET'])
-    def get_trader_charting():
-        # Endpoint to pass trader indicator data.
-        market = request.args.get('market')
-        limit = int(request.args.get('limit'))
-        data = {'market':market}
+@APP.route('/rest-api/v1/trader_update', methods=['POST'])
+def update_trader():
+    # Base API for managing trader interaction.
+    data = request.get_json()
 
-        ## Check if specified bot exists.
-        current_trader = api_error_check(data)
+    ## Check if specified bot exists.
+    current_trader = api_error_check(data)
 
-        if current_trader == None:
-            ## No trader therefore return false.
-            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+    if current_trader == None:
+        ## No trader therefore return false.
+        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+    elif data['action'] == 'start':
+        ## Updating trader status to running.
+        if current_trader.state_data['runtime_state'] == 'FORCE_PAUSE':
+            current_trader.state_data['runtime_state'] = 'RUN'
+    elif data['action'] == 'pause':
+        ## Updating trader status to paused.
+        if current_trader.state_data['runtime_state'] == 'RUN':
+            current_trader.state_data['runtime_state'] = 'FORCE_PAUSE'
+    else:
+        ## If action was not found return false
+        return(json.dumps({'call':False, 'message':'INVALID_ACTION'}))
 
-        candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
-        indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
-        short_indicator_data = shorten_indicators(indicator_data, candle_data[-1][0])
-
-        return(json.dumps({'call':True, 'data':{'market':market, 'indicators':short_indicator_data, 'candles':candle_data}}))
-
-
-    @APP.route('/rest-api/v1/get_trader_indicators', methods=['GET'])
-    def get_trader_indicators():
-        # Endpoint to pass trader indicator data.
-        market = request.args.get('market')
-        limit = int(request.args.get('limit'))
-        data = {'market':market}
-
-        ## Check if specified bot exists.
-        current_trader = api_error_check(data)
-
-        if current_trader == None:
-            ## No trader therefore return false.
-            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
-
-        indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
-
-        return(json.dumps({'call':True, 'data':{'market':market, 'indicators':indicator_data}}))
+    return(json.dumps({'call':True}))
 
 
-    @APP.route('/rest-api/v1/get_trader_candles', methods=['GET'])
-    def get_trader_candles():
-        # Endpoint to pass trader candles.
-        market = request.args.get('market')
-        limit = int(request.args.get('limit'))
-        data = {'market':market}
+@APP.route('/rest-api/v1/get_trader_charting', methods=['GET'])
+def get_trader_charting():
+    # Endpoint to pass trader indicator data.
+    market = request.args.get('market')
+    limit = int(request.args.get('limit'))
+    data = {'market':market}
 
-        ## Check if specified bot exists.
-        current_trader = api_error_check(data)
+    ## Check if specified bot exists.
+    current_trader = api_error_check(data)
 
-        if current_trader == None:
-            ## No trader therefore return false.
-            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+    if current_trader == None:
+        ## No trader therefore return false.
+        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
 
-        candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
+    candle_data = core_object_web.get_trader_candles(current_trader.print_pair)[:limit]
+    indicator_data = core_object_web.get_trader_indicators(current_trader.print_pair)
+    short_indicator_data = shorten_indicators(indicator_data, candle_data[-1][0])
 
-        return(json.dumps({'call':True, 'data':{'market':market, 'candles':candle_data}}))
+    return(json.dumps({'call':True, 'data':{'market':market, 'indicators':short_indicator_data, 'candles':candle_data}}))
 
 
-    @APP.route('/rest-api/v1/test', methods=['GET'])
-    def test_rest_call():
-        # API endpoint test
-        return(json.dumps({'call':True, 'message':'HELLO WORLD!'}))
+@APP.route('/rest-api/v1/get_trader_indicators', methods=['GET'])
+def get_trader_indicators():
+    # Endpoint to pass trader indicator data.
+    market = request.args.get('market')
+    limit = int(request.args.get('limit'))
+    data = {'market':market}
+
+    ## Check if specified bot exists.
+    current_trader = api_error_check(data)
+
+    if current_trader == None:
+        ## No trader therefore return false.
+        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+
+    indicator_data = core_object_web.get_trader_indicators(current_trader.print_pair)
+
+    return(json.dumps({'call':True, 'data':{'market':market, 'indicators':indicator_data}}))
+
+
+@APP.route('/rest-api/v1/get_trader_candles', methods=['GET'])
+def get_trader_candles():
+    # Endpoint to pass trader candles.
+    market = request.args.get('market')
+    limit = int(request.args.get('limit'))
+    data = {'market':market}
+
+    ## Check if specified bot exists.
+    current_trader = api_error_check(data)
+
+    if current_trader == None:
+        ## No trader therefore return false.
+        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+
+    candle_data = core_object_web.get_trader_candles(current_trader.print_pair)[:limit]
+
+    return(json.dumps({'call':True, 'data':{'market':market, 'candles':candle_data}}))
+
+
+@APP.route('/rest-api/v1/test', methods=['GET'])
+def test_rest_call():
+    # API endpoint test
+    return(json.dumps({'call':True, 'message':'HELLO WORLD!'}))
 
 
 def shorten_indicators(indicators, end_time):
@@ -545,13 +543,11 @@ class BotCore():
 
 
 def start(settings, logs_dir, cache_dir):
-    
     global core_object, host_ip, host_port
-    core_object = None
-
+    core_object == None
     if core_object == None:
         core_object = BotCore(settings, logs_dir, cache_dir)
-        print(settings)
+        print(core_object.settings)
         core_object.start()
 
     logging.info('[BotCore] Starting traders in {0} mode, market type is {1}.'.format(settings['run_type'], settings['market_type']))
