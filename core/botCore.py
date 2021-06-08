@@ -547,7 +547,7 @@ def start(settings, logs_dir, cache_dir):
 
     if core_object == None:
         core_object = BotCore(settings, logs_dir, cache_dir)
-        print(core_object.settings)
+        print(settings)
         core_object.start()
 
     logging.info('[BotCore] Starting traders in {0} mode, market type is {1}.'.format(settings['run_type'], settings['market_type']))
