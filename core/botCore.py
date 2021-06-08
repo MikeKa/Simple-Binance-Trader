@@ -40,8 +40,8 @@ class BotFront():
         logging.info('[BotCore] Initilizing the BotCore object.')
 
         ## Setup binance REST and socket API.
-        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
-        self.socket_api         = socket_master.Binance_SOCK()
+#        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
+#        self.socket_api         = socket_master.Binance_SOCK()
 
         ## Setup the logs/cache dir locations.
         self.logs_dir           = logs_dir
