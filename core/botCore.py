@@ -21,7 +21,7 @@ from core import trader
 MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 
 # Initilize globals.
-core_object == None
+core_object = None
 ## Setup flask app/socket
 APP         = Flask(__name__)
 SOCKET_IO   = SocketIO(APP)
