@@ -32,7 +32,7 @@ cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 cwd = os.getcwd()
 logs_dir = 'cache/'.format(cwd)
 cache_dir = 'logs/'.format(cwd)
-settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500,'max_depth':50}
+settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500, 'max_depth':50, 'market_type':'MARGIN', 'trading_currency':0.002, 'trader_interval':'5m', 'trading_markets':'BTC-ETH'}
 
 class BotFront():
     def __init__(self, settings, logs_dir, cache_dir):
@@ -48,9 +48,9 @@ class BotFront():
         self.cache_dir          = cache_dir
 
         ## Setup run type, market type, and update bnb balance.
-        self.run_type           = settings['run_type']
+#        self.run_type           = settings['run_type']
         self.market_type        = settings['market_type']
-        self.update_bnb_balance = settings['update_bnb_balance']
+#        self.update_bnb_balance = settings['update_bnb_balance']
 
         ## Setup max candle/depth setting.
         self.max_candles        = settings['max_candles']
