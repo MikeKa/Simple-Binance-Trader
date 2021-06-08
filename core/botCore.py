@@ -35,7 +35,43 @@ cache_dir = 'logs/'.format(cwd)
 settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500,'max_depth':50}
 
 ## Initilize base core object.
-core_object = BotCore(settings, logs_dir, cache_dir)
+core_object = BotFront(settings, logs_dir, cache_dir)
+
+Class BotFront()
+    def __call__(self, settings, logs_dir, cache_dir):
+        # Initilization for the bot core managment object.
+        logging.info('[BotCore] Initilizing the BotCore object.')
+
+        ## Setup binance REST and socket API.
+        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
+        self.socket_api         = socket_master.Binance_SOCK()
+
+        ## Setup the logs/cache dir locations.
+        self.logs_dir           = logs_dir
+        self.cache_dir          = cache_dir
+
+        ## Setup run type, market type, and update bnb balance.
+        self.run_type           = settings['run_type']
+        self.market_type        = settings['market_type']
+        self.update_bnb_balance = settings['update_bnb_balance']
+
+        ## Setup max candle/depth setting.
+        self.max_candles        = settings['max_candles']
+        self.max_depth          = settings['max_depth']
+
+        ## Get base quote pair (This prevents multiple different pairs from conflicting.)
+        pair_one = settings['trading_markets'][0]
+
+        self.quote_asset        = pair_one[:pair_one.index('-')]
+        self.base_currency      = settings['trading_currency']
+        self.candle_Interval    = settings['trader_interval']
+
+        ## Initilize base trader settings.
+        self.trader_objects     = []
+        self.trading_markets    = settings['trading_markets']
+
+        ## Initilize core state
+        self.coreState          = 'READY'
 
 started_updater = False
 
