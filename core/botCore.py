@@ -28,9 +28,14 @@ SOCKET_IO   = SocketIO(APP)
 CORS(APP)
 cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 
-## Initilize base core object.
+## Setup base core object properties    
+cwd = os.getcwd()
+logs_dir_DIR = 'cache/'.format(cwd)
+cache_dir = 'logs/'.format(cwd)
+settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500,'max_depth':50}
 
-core_object = None
+## Initilize base core object.
+core_object = BotCore(settings, logs_dir, cache_dir)
 
 started_updater = False
 
