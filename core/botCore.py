@@ -68,7 +68,7 @@ class BotFront():
         self.trading_markets    = settings['trading_markets']
 
         ## Initilize core state
-       self.coreState          = 'READY'
+        self.coreState          = 'READY'
 
 ## Initilize base core object.
 core_object = BotFront(settings, logs_dir, cache_dir)
