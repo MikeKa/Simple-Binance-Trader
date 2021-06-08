@@ -76,143 +76,142 @@ if __name__ == '__main__':
     core_object = BotFront(settings, logs_dir, cache_dir)
     print(settings)
 
-core_object = None
-started_updater = False
+    started_updater = False
 
-## Initilize IP/port pair globals.
-host_ip     = ''
-host_port   = ''
+    ## Initilize IP/port pair globals.
+    host_ip     = ''
+    host_port   = ''
 
-## Set traders cache file name.
-CAHCE_FILES = 'traders.json'
-
-
-@APP.context_processor
-def override_url_for():
-    return(dict(url_for=dated_url_for))
+    ## Set traders cache file name.
+    CAHCE_FILES = 'traders.json'
 
 
-def dated_url_for(endpoint, **values):
-    # Override to prevent cached assets being used.
-    if endpoint == 'static':
-        filename = values.get('filename', None)
-        if filename:
-            file_path = os.path.join(APP.root_path,
-                                    endpoint,
-                                    filename)
-            values['q'] = int(os.stat(file_path).st_mtime)
-    return url_for(endpoint, **values)
+    @APP.context_processor
+    def override_url_for():
+        return(dict(url_for=dated_url_for))
 
 
-@APP.route('/', methods=['GET'])
-def control_panel():
-    # Base control panel configuration.
-    global started_updater
-
-    ## Web updater used for live updating.
-    if not(started_updater):
-        started_updater = True
-        web_updater_thread = threading.Thread(target=web_updater)
-        web_updater_thread.start()
-
-    ## Set socket ip/port.
-    start_up_data = {
-        'host':{'IP': host_ip, 'Port': host_port},
-        'market_symbols': core_object.trading_markets
-    }
-
-    return(render_template('main_page.html', data=start_up_data))
+    def dated_url_for(endpoint, **values):
+        # Override to prevent cached assets being used.
+        if endpoint == 'static':
+            filename = values.get('filename', None)
+            if filename:
+                file_path = os.path.join(APP.root_path,
+                                        endpoint,
+                                        filename)
+                values['q'] = int(os.stat(file_path).st_mtime)
+        return url_for(endpoint, **values)
 
 
-@APP.route('/rest-api/v1/trader_update', methods=['POST'])
-def update_trader():
-    # Base API for managing trader interaction.
-    data = request.get_json()
+    @APP.route('/', methods=['GET'])
+    def control_panel():
+        # Base control panel configuration.
+        global started_updater
 
-    ## Check if specified bot exists.
-    current_trader = api_error_check(data)
+        ## Web updater used for live updating.
+        if not(started_updater):
+            started_updater = True
+            web_updater_thread = threading.Thread(target=web_updater)
+            web_updater_thread.start()
 
-    if current_trader == None:
-        ## No trader therefore return false.
-        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
-    elif data['action'] == 'start':
-        ## Updating trader status to running.
-        if current_trader.state_data['runtime_state'] == 'FORCE_PAUSE':
-            current_trader.state_data['runtime_state'] = 'RUN'
-    elif data['action'] == 'pause':
-        ## Updating trader status to paused.
-        if current_trader.state_data['runtime_state'] == 'RUN':
-            current_trader.state_data['runtime_state'] = 'FORCE_PAUSE'
-    else:
-        ## If action was not found return false
-        return(json.dumps({'call':False, 'message':'INVALID_ACTION'}))
+        ## Set socket ip/port.
+        start_up_data = {
+            'host':{'IP': host_ip, 'Port': host_port},
+            'market_symbols': core_object.trading_markets
+        }
 
-    return(json.dumps({'call':True}))
+        return(render_template('main_page.html', data=start_up_data))
 
 
-@APP.route('/rest-api/v1/get_trader_charting', methods=['GET'])
-def get_trader_charting():
-    # Endpoint to pass trader indicator data.
-    market = request.args.get('market')
-    limit = int(request.args.get('limit'))
-    data = {'market':market}
+    @APP.route('/rest-api/v1/trader_update', methods=['POST'])
+    def update_trader():
+        # Base API for managing trader interaction.
+        data = request.get_json()
 
-    ## Check if specified bot exists.
-    current_trader = api_error_check(data)
+        ## Check if specified bot exists.
+        current_trader = api_error_check(data)
 
-    if current_trader == None:
-        ## No trader therefore return false.
-        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+        if current_trader == None:
+            ## No trader therefore return false.
+            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+        elif data['action'] == 'start':
+            ## Updating trader status to running.
+            if current_trader.state_data['runtime_state'] == 'FORCE_PAUSE':
+                current_trader.state_data['runtime_state'] = 'RUN'
+        elif data['action'] == 'pause':
+            ## Updating trader status to paused.
+            if current_trader.state_data['runtime_state'] == 'RUN':
+                current_trader.state_data['runtime_state'] = 'FORCE_PAUSE'
+        else:
+            ## If action was not found return false
+            return(json.dumps({'call':False, 'message':'INVALID_ACTION'}))
 
-    candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
-    indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
-    short_indicator_data = shorten_indicators(indicator_data, candle_data[-1][0])
-
-    return(json.dumps({'call':True, 'data':{'market':market, 'indicators':short_indicator_data, 'candles':candle_data}}))
-
-
-@APP.route('/rest-api/v1/get_trader_indicators', methods=['GET'])
-def get_trader_indicators():
-    # Endpoint to pass trader indicator data.
-    market = request.args.get('market')
-    limit = int(request.args.get('limit'))
-    data = {'market':market}
-
-    ## Check if specified bot exists.
-    current_trader = api_error_check(data)
-
-    if current_trader == None:
-        ## No trader therefore return false.
-        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
-
-    indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
-
-    return(json.dumps({'call':True, 'data':{'market':market, 'indicators':indicator_data}}))
+        return(json.dumps({'call':True}))
 
 
-@APP.route('/rest-api/v1/get_trader_candles', methods=['GET'])
-def get_trader_candles():
-    # Endpoint to pass trader candles.
-    market = request.args.get('market')
-    limit = int(request.args.get('limit'))
-    data = {'market':market}
+    @APP.route('/rest-api/v1/get_trader_charting', methods=['GET'])
+    def get_trader_charting():
+        # Endpoint to pass trader indicator data.
+        market = request.args.get('market')
+        limit = int(request.args.get('limit'))
+        data = {'market':market}
 
-    ## Check if specified bot exists.
-    current_trader = api_error_check(data)
+        ## Check if specified bot exists.
+        current_trader = api_error_check(data)
 
-    if current_trader == None:
-        ## No trader therefore return false.
-        return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+        if current_trader == None:
+            ## No trader therefore return false.
+            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
 
-    candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
+        candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
+        indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
+        short_indicator_data = shorten_indicators(indicator_data, candle_data[-1][0])
 
-    return(json.dumps({'call':True, 'data':{'market':market, 'candles':candle_data}}))
+        return(json.dumps({'call':True, 'data':{'market':market, 'indicators':short_indicator_data, 'candles':candle_data}}))
 
 
-@APP.route('/rest-api/v1/test', methods=['GET'])
-def test_rest_call():
-    # API endpoint test
-    return(json.dumps({'call':True, 'message':'HELLO WORLD!'}))
+    @APP.route('/rest-api/v1/get_trader_indicators', methods=['GET'])
+    def get_trader_indicators():
+        # Endpoint to pass trader indicator data.
+        market = request.args.get('market')
+        limit = int(request.args.get('limit'))
+        data = {'market':market}
+
+        ## Check if specified bot exists.
+        current_trader = api_error_check(data)
+
+        if current_trader == None:
+            ## No trader therefore return false.
+            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+
+        indicator_data = core_object.get_trader_indicators(current_trader.print_pair)
+
+        return(json.dumps({'call':True, 'data':{'market':market, 'indicators':indicator_data}}))
+
+
+    @APP.route('/rest-api/v1/get_trader_candles', methods=['GET'])
+    def get_trader_candles():
+        # Endpoint to pass trader candles.
+        market = request.args.get('market')
+        limit = int(request.args.get('limit'))
+        data = {'market':market}
+
+        ## Check if specified bot exists.
+        current_trader = api_error_check(data)
+
+        if current_trader == None:
+            ## No trader therefore return false.
+            return(json.dumps({'call':False, 'message':'INVALID_TRADER'}))
+
+        candle_data = core_object.get_trader_candles(current_trader.print_pair)[:limit]
+
+        return(json.dumps({'call':True, 'data':{'market':market, 'candles':candle_data}}))
+
+
+    @APP.route('/rest-api/v1/test', methods=['GET'])
+    def test_rest_call():
+        # API endpoint test
+        return(json.dumps({'call':True, 'message':'HELLO WORLD!'}))
 
 
 def shorten_indicators(indicators, end_time):
@@ -544,6 +543,9 @@ class BotCore():
 
 
 def start(settings, logs_dir, cache_dir):
+    
+    core_object = None
+    
     global core_object, host_ip, host_port
 
     if core_object == None:
