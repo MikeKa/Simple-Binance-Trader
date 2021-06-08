@@ -64,7 +64,7 @@ class BotFront():
         self.candle_Interval    = settings['trader_interval']
 
         ## Initilize base trader settings.
-        #self.trader_objects     = []
+        self.trader_objects     = []
         self.trading_markets    = settings['trading_markets']
 
         ## Initilize core state
@@ -73,7 +73,6 @@ class BotFront():
 ## Initilize base core object.
 core_object = BotFront(settings, logs_dir, cache_dir)
 print(settings)
-print(core_object)
 
 #core_object = None
 started_updater = False
@@ -547,6 +546,7 @@ def start(settings, logs_dir, cache_dir):
 
     if core_object == None:
         core_object = BotCore(settings, logs_dir, cache_dir)
+        print(core_object.settings)
         core_object.start()
 
     logging.info('[BotCore] Starting traders in {0} mode, market type is {1}.'.format(settings['run_type'], settings['market_type']))
