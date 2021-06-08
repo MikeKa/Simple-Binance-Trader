@@ -32,7 +32,7 @@ cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 cwd = os.getcwd()
 logs_dir = 'cache/'.format(cwd)
 cache_dir = 'logs/'.format(cwd)
-settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500, 'max_depth':50, 'market_type':'margin', 'trading_currency':0.002, 'trader_interval':'5m', 'trading_markets':['btc-eth']}
+settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500, 'max_depth':50, 'market_type':'MARGIN', 'trading_currency':0.002, 'trader_interval':'5m', 'trading_markets':['BTC-ETH']}
 
 class BotFront():
     def __init__(self, settings, logs_dir, cache_dir):
