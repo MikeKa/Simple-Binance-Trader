@@ -57,9 +57,10 @@ class BotFront():
         self.max_depth          = settings['max_depth']
 
         ## Get base quote pair (This prevents multiple different pairs from conflicting.)
-#        pair_one = settings['trading_markets'][0]
+        pair_one = settings['trading_markets'][0]
+        print(pair_one)
 
- #       self.quote_asset        = pair_one[:pair_one.index('-')]
+        self.quote_asset        = pair_one[:pair_one.index('-')]
         self.base_currency      = settings['trading_currency']
         self.candle_Interval    = settings['trader_interval']
 
