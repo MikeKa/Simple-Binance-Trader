@@ -21,10 +21,18 @@ from core import trader
 MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 
 # Initilize globals.
+## Initilize IP/port pair globals.
+host_ip     = ''
+host_port   = ''
+
+## Set traders cache file name.
+CAHCE_FILES = 'traders.json'
+
 
 ## Setup flask app/socket
+
+APP         = Flask(__name__)
 if __name__ == '__main__':
-    APP         = Flask(__name__)
     SOCKET_IO   = SocketIO(APP)
     CORS(APP)
     cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
@@ -78,12 +86,6 @@ if __name__ == '__main__':
 
     started_updater = False
 
-    ## Initilize IP/port pair globals.
-    host_ip     = ''
-    host_port   = ''
-
-    ## Set traders cache file name.
-    CAHCE_FILES = 'traders.json'
 
 
     @APP.context_processor
