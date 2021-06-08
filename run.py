@@ -2,6 +2,8 @@
 import os
 import logging
 from core import botCore
+from botCore import APP
+from botCore import SOCKET_IO
 
 ## Setup    
 cwd = os.getcwd()
