@@ -1,15 +1,27 @@
 #! /usr/bin/env python3
 import os
 import logging
+
+from flask_socketio import SocketIO
+from flask import Flask, render_template, url_for, request
+from flask_cors import CORS
 from core import botCore
-from botCore import APP
-from botCore import SOCKET_IO
+
+## Setup flask app/socket
+APP         = Flask(__name__)
+SOCKET_IO   = SocketIO(APP)
+CORS(APP)
+cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
+
+## Initilize base core object.
+
+core_object = None
+
 
 ## Setup    
 cwd = os.getcwd()
 CACHE_DIR = 'cache/'.format(cwd)
 LOGS_DIR = 'logs/'.format(cwd)
-global core_object, settings
 
 ## Settup logging.
 log_format = '%(asctime)s:%(name)s:%(message)s'
