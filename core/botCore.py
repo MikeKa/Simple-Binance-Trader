@@ -21,7 +21,7 @@ from core import trader
 MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 
 # Initilize globals.
-
+core_object == None
 ## Setup flask app/socket
 APP         = Flask(__name__)
 SOCKET_IO   = SocketIO(APP)
@@ -544,7 +544,7 @@ class BotCore():
 
 def start(settings, logs_dir, cache_dir):
     global core_object, host_ip, host_port
-    core_object == None
+
     if core_object == None:
         core_object = BotCore(settings, logs_dir, cache_dir)
         print(core_object.settings)
