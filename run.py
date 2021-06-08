@@ -2,21 +2,7 @@
 import os
 import logging
 
-from flask_socketio import SocketIO
-from flask import Flask, render_template, url_for, request
-from flask_cors import CORS
 from core import botCore
-
-## Setup flask app/socket
-APP         = Flask(__name__)
-SOCKET_IO   = SocketIO(APP)
-CORS(APP)
-cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
-
-## Initilize base core object.
-
-core_object = None
-
 
 ## Setup    
 cwd = os.getcwd()
@@ -127,12 +113,7 @@ if __name__ == '__main__':
         botCore.start(settings, LOGS_DIR, CACHE_DIR)
         host_ip = settings['host_ip']
         host_port = settings['host_port']
-    
-        SOCKET_IO.run(APP, 
-            host=settings['host_ip'], 
-            port=settings['host_port'], 
-            debug=True, 
-            use_reloader=False)
+
     else:
         with open(SETTINGS_FILE_NAME, 'w') as f:
             f.write(DEFAULT_SETTINGS_DATA)
