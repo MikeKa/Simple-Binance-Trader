@@ -7,6 +7,7 @@ from core import botCore
 cwd = os.getcwd()
 CACHE_DIR = 'cache/'.format(cwd)
 LOGS_DIR = 'logs/'.format(cwd)
+global core_object, settings
 
 ## Settup logging.
 log_format = '%(asctime)s:%(name)s:%(message)s'
