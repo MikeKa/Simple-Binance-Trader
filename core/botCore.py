@@ -8,9 +8,9 @@ import hashlib
 import logging
 import threading
 from decimal import Decimal
-#from flask_socketio import SocketIO
-#from flask import Flask, render_template, url_for, request
-#from flask_cors import CORS
+from flask_socketio import SocketIO
+from flask import Flask, render_template, url_for, request
+from flask_cors import CORS
 
 from core.binance_api import rest_master
 from core.binance_api import socket_master
@@ -23,14 +23,14 @@ MULTI_DEPTH_INDICATORS = ['ema', 'sma', 'rma', 'order']
 # Initilize globals.
 
 ## Setup flask app/socket
-#APP         = Flask(__name__)
-#SOCKET_IO   = SocketIO(APP)
-#CORS(APP)
-#cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
+APP         = Flask(__name__)
+SOCKET_IO   = SocketIO(APP)
+CORS(APP)
+cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
 
 ## Initilize base core object.
 
-#core_object = None
+core_object = None
 
 started_updater = False
 
