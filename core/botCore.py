@@ -35,9 +35,9 @@ cache_dir = 'logs/'.format(cwd)
 settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port':5000, 'max_candles':500,'max_depth':50}
 
 ## Initilize base core object.
-core_object = botFront(settings, logs_dir, cache_dir)
+core_object = BotFront(settings, logs_dir, cache_dir)
 
-Class botFront():
+class BotFront():
     def __call__(self, settings, logs_dir, cache_dir):
         # Initilization for the bot core managment object.
         logging.info('[BotCore] Initilizing the BotCore object.')
