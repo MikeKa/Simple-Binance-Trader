@@ -40,12 +40,12 @@ class BotFront():
         logging.info('[BotCore] Initilizing the BotCore object.')
 
         ## Setup binance REST and socket API.
-        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
-        self.socket_api         = socket_master.Binance_SOCK()
+#        self.rest_api           = rest_master.Binance_REST(settings['public_key'], settings['private_key'])
+#        self.socket_api         = socket_master.Binance_SOCK()
 
         ## Setup the logs/cache dir locations.
-        self.logs_dir           = logs_dir
-        self.cache_dir          = cache_dir
+#       self.logs_dir           = logs_dir
+#       self.cache_dir          = cache_dir
 
         ## Setup run type, market type, and update bnb balance.
 #        self.run_type           = settings['run_type']
@@ -57,18 +57,18 @@ class BotFront():
         self.max_depth          = settings['max_depth']
 
         ## Get base quote pair (This prevents multiple different pairs from conflicting.)
-        pair_one = settings['trading_markets'][0]
+#        pair_one = settings['trading_markets'][0]
 
-        self.quote_asset        = pair_one[:pair_one.index('-')]
+ #       self.quote_asset        = pair_one[:pair_one.index('-')]
         self.base_currency      = settings['trading_currency']
         self.candle_Interval    = settings['trader_interval']
 
         ## Initilize base trader settings.
-        self.trader_objects     = []
+  #      self.trader_objects     = []
         self.trading_markets    = settings['trading_markets']
 
         ## Initilize core state
-        self.coreState          = 'READY'
+  #     self.coreState          = 'READY'
 
 ## Initilize base core object.
 core_object = BotFront(settings, logs_dir, cache_dir)
