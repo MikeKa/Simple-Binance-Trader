@@ -150,7 +150,7 @@ function rest_api(method, endpoint, data=null, target_function=null, target_elem
     // if either the user has requested a force update on bot data or the user has added a new market to trade then send an update to the backend.
     console.log(`'M: ${method}, ULR: /rest-api/v1/${endpoint}, D:${data}`);
     let request = new XMLHttpRequest();
-    request.open(method, '/rest-api/v1/'+endpoint, true);
+    request.open(method, 'https://trading-bot-easyai.herokuapp.com/rest-api/v1/'+endpoint, true);
 
     request.onload = function() {
         if (this.status == 200){
