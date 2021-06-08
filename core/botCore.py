@@ -544,10 +544,9 @@ class BotCore():
 
 def start(settings, logs_dir, cache_dir):
     
+    global core_object, host_ip, host_port
     core_object = None
     
-    global core_object, host_ip, host_port
-
     if core_object == None:
         core_object = BotCore(settings, logs_dir, cache_dir)
         print(core_object.settings)
