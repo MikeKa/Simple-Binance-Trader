@@ -37,7 +37,7 @@ settings = {'public_key':'', 'private_key':'', 'host_ip':'127.0.0.1', 'host_port
 ## Initilize base core object.
 core_object = botFront(settings, logs_dir, cache_dir)
 
-Class botFront()
+Class botFront():
     def __call__(self, settings, logs_dir, cache_dir):
         # Initilization for the bot core managment object.
         logging.info('[BotCore] Initilizing the BotCore object.')
