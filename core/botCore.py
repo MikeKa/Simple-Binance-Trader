@@ -27,7 +27,7 @@ APP         = Flask(__name__)
 SOCKET_IO   = SocketIO(APP)
 CORS(APP)
 cors = CORS(APP, resources={r"/api/*": {"origins": "*"}})
-"""
+
 ## Setup base core object properties    
 cwd = os.getcwd()
 logs_dir = 'cache/'.format(cwd)
@@ -72,8 +72,8 @@ class BotFront():
 
 ## Initilize base core object.
 core_object = BotFront(settings, logs_dir, cache_dir)
-"""
-core_object = None
+
+#core_object = None
 started_updater = False
 
 ## Initilize IP/port pair globals.
