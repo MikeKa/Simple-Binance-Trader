@@ -508,5 +508,11 @@ def start(settings, logs_dir, cache_dir):
     logging.info('[BotCore] Starting traders in {0} mode, market type is {1}.'.format(settings['run_type'], settings['market_type']))
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
+            
+    SOCKET_IO.run(APP, 
+        host=settings['host_ip'], 
+        port=settings['host_port'],
+        debug=True, 
+        use_reloader=False)
 
 
