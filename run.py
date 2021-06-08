@@ -111,6 +111,14 @@ if __name__ == '__main__':
     if os.path.exists(SETTINGS_FILE_NAME):
         settings = settings_reader()
         botCore.start(settings, LOGS_DIR, CACHE_DIR)
+        host_ip = settings['host_ip']
+        host_port = settings['host_port']
+    
+        SOCKET_IO.run(APP, 
+            host=settings['host_ip'], 
+            port=settings['host_port'], 
+            debug=True, 
+            use_reloader=False)
     else:
         with open(SETTINGS_FILE_NAME, 'w') as f:
             f.write(DEFAULT_SETTINGS_DATA)
